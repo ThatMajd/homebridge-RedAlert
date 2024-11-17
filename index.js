@@ -75,11 +75,12 @@ HttpMotion.prototype = {
            } else {
                if (body && body.trim()){
                   try {
+                     // Can be deleted to reduce log clutter
+                     this.log(`HTTP successful response: ${body}`);
+                     
                      const response = JSON.parse(body);
                      const dataList = response[this.json_response];
 
-                     // Can be deleted to reduce log clutter
-                     this.log(`HTTP successful response: ${body}`);
 
                      // Check if any of the targets are in the data list
                      if (Array.isArray(dataList)) {
