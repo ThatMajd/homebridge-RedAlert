@@ -7,7 +7,7 @@ For ease of mind the plugin can be setup to work with any endpoint for testing p
 ### Installation
 
 1. Install homebridge using: ```npm install -g homebridge```
-2. Install this plugin using: ```sudo npm install -g git https://github.com/lagunacomputer/homebridge-MotionSensor.git```
+2. Install this plugin using: ```sudo npm install -g git https://github.com/ThatMajd/homebridge-RedAlert.git```
 3. Update your configuration file. See sample-config.json in this repository for a sample.
 
 ### Configuration
@@ -25,6 +25,9 @@ Optional:
  * ```http_method``` Http metod that will be used to call the ```url``` when the state is requested. Default is 'GET' (check request module to get the available options).
  * ```timeout``` Maximum time in miliseconds to wait for the sensor response before fail (Default 3000ms).
 
+### Hosting your own
+To run your own **testing** endpoint, run the following: `node broadcast.js`
+
 ### Endpoint expectations
 Expected output from endpoint:
 ```
@@ -36,6 +39,3 @@ Expected output from endpoint:
   desc: "היכנסו למרחב המוגן ושהו בו 10 דקות",
 }
 ```
-
-### Hosting your own
-To run your own **testing** endpoint, run the following: `node broadcast.js`
