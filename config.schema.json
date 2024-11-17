@@ -1,0 +1,24 @@
+{
+    "pluginAlias": "Red Alert homebridge",
+    "pluginType": "platform",
+    "singular": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "name",
+          "type": "string",
+          "default": "red_alert_sensor",
+          "required": true
+        },
+        "targets": {
+        "title": "Location to be alerted about",
+        "type": "array",
+        "items": {
+          "title": "Location",
+          "type": "string"
+        }
+      }
+      }
+    }
+  }

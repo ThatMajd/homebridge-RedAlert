@@ -27,25 +27,18 @@ function HttpMotion(log, config) {
    // Default fallback configuration if none is provided
    if (!config) {
        this.log("No configuration provided. Using default settings.");
-       this.url = URL;
-       this.http_method = HTTP_METHOD;
-       this.json_response = JSON_RESPONSE;
-       this.update_interval = DEF_INTERVAL;
-       this.headers = HEADERS;
-       this.targets = ["מעלות תרשיחא"]; // Default target list
    } else {
-       // Use provided configuration
        this.log("Using custom configuration")
-       this.url = config["url"] || URL;
-       this.http_method = config["http_method"] || HTTP_METHOD;
-       this.json_response = config["json_response"] || JSON_RESPONSE;
-       this.update_interval = Number(config["update_interval"] || DEF_INTERVAL);
-       this.headers = config["headers"] || HEADERS;
-       this.targets = config["targets"] || ["מעלות תרשיחא"]; // Configurable target list
    }
-
-   this.name = "Red Alert Sensor";
-   this.manufacturer = "@Majd_Bishara";
+      
+   this.name = config["name"] || "Red Alert Sensor";
+   this.url = config["url"] || URL;
+   this.http_method = config["http_method"] || HTTP_METHOD;
+   this.json_response = config["json_response"] || JSON_RESPONSE;
+   this.update_interval = Number(config["update_interval"] || DEF_INTERVAL);
+   this.headers = config["headers"] || HEADERS;
+   this.targets = config["targets"]; // Configurable target list
+   this.manufacturer = "@TM_Industries";
    this.model = "Red_Alerter_5000";
    this.serial = "420-420-420";
    this.timeout = DEF_TIMEOUT;
@@ -75,12 +68,13 @@ HttpMotion.prototype = {
        request(ops, (error, res, body) => {
            let value = false;
            if (error) {
-               this.log(`HTTP bad response (${ops.uri}): ${error.message}`);
+               this.log(`Your endpoint is not setup or not connected to internet`);
            } else {
                try {
                    const response = JSON.parse(body);
                    const dataList = response[this.json_response];
 
+                  // Can be deleted to reduce log clutter
                    this.log(`HTTP successful response: ${body}`);
 
                    // Check if any of the targets are in the data list

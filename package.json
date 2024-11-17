@@ -1,7 +1,7 @@
 {
-  "name": "homebridge-MotionSensor",
-  "version": "4.0.0",
-  "description": "http/https motion sensor plugin for homebridge",
+  "name": "homebridge-RedAlert",
+  "version": "1.0.0",
+  "description": "Red Alert sensor for homebridge",
   "license": "ISC",
   "keywords": [
     "homebridge-plugin",
@@ -13,14 +13,14 @@
     "homebridge": ">=0.2.0"
   },
   "author": {
-    "name": "@lagunacomputer"
+    "name": "@majd_bishara"
   },
   "contributors": [{
-    "name": "@metbosch"
+    "name": "@majd_bishara"
   }],
   "repository": {
     "type": "git",
-    "url": "git://github.com/lagunacomputer/homebridge-MotionSensor.git"
+    "url": "git://github.com/ThatMajd/homebridge-RedAlert.git"
   },
   "dependencies": {
     "request": "^2.0.0"
