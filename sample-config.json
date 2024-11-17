@@ -13,15 +13,9 @@
     "accessories": [
         {
             "accessory": "Motion",
-            "name": "Outside Motion Sensor",
-            "url": "http://192.168.1.210/motionEndpoint",
+            "name": "Red Alrt Sensor",
+            "url": "http://localhost:3000",
             "http_method": "GET"
-        },{
-            "accessory": "Motion",
-            "name": "Bedroom Motion Sensor",
-            "url": "http://192.168.1.220/motionEndpoint?json=true",
-            "http_method": "GET",
-            "json_response": "value"
         }
     ]
 }
