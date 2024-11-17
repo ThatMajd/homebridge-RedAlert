@@ -1,6 +1,6 @@
 {
     "pluginAlias": "Red Alert homebridge",
-    "pluginType": "platform",
+    "pluginType": "accessory",
     "singular": true,
     "schema": {
       "type": "object",
@@ -16,7 +16,8 @@
         "type": "array",
         "items": {
           "title": "Location",
-          "type": "string"
+          "type": "string",
+          "required": true
         }
       }
       }
