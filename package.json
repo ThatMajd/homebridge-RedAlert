@@ -1,5 +1,5 @@
 {
-  "name": "homebridge-test_RedAlert",
+  "name": "homebridge-RedAlert",
   "version": "1.0.0",
   "description": "Red Alert sensor for homebridge",
   "license": "ISC",
