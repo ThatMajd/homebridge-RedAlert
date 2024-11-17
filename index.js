@@ -46,6 +46,8 @@ function HttpMotion(log, config) {
    // Internal variables
    this.last_state = false;
    this.waiting_response = false;
+
+   this.log(`Fetching Alerts from ${this.url}`)
 }
 
 HttpMotion.prototype = {
@@ -68,28 +70,33 @@ HttpMotion.prototype = {
        request(ops, (error, res, body) => {
            let value = false;
            if (error) {
-               this.log(`Your endpoint is not setup or not connected to internet`);
+               // Turned off this line so to not flood the Logger
+               // this.log(`Your endpoint is not setup or not connected to internet`);
            } else {
-               try {
-                   const response = JSON.parse(body);
-                   const dataList = response[this.json_response];
+               if (body && body.trim()){
+                  try {
+                     const response = JSON.parse(body);
+                     const dataList = response[this.json_response];
 
-                  // Can be deleted to reduce log clutter
-                   this.log(`HTTP successful response: ${body}`);
+                     // Can be deleted to reduce log clutter
+                     this.log(`HTTP successful response: ${body}`);
 
-                   // Check if any of the targets are in the data list
-                   if (Array.isArray(dataList)) {
-                       value = this.targets.some(target => dataList.includes(target));
-                       if (value) {
-                           this.log(`Detected target(s) in data: ${this.targets}`);
-                       }
-                   } else {
-                       this.log(`Expected an array in the response, got: ${typeof dataList}`);
-                   }
-               } catch (parseErr) {
-                   this.log(`Error processing received information: ${parseErr.message}`);
+                     // Check if any of the targets are in the data list
+                     if (Array.isArray(dataList)) {
+                        value = this.targets.some(target => dataList.includes(target));
+                        if (value) {
+                              this.log(`Detected target(s) in data: ${this.targets}`);
+                        }
+                     } 
+                     else {
+                        this.log(`Expected an array in the response, got: ${typeof dataList}`);
+                     }
+                  }
+                  catch (parseErr) {
+                     this.log(`Error processing received information: ${parseErr.message}`);
+                     }
+                  }
                }
-           }
 
            // Update the sensor state
            this.motionService

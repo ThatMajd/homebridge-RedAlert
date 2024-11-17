@@ -15,14 +15,17 @@
   "author": {
     "name": "@majd_bishara"
   },
-  "contributors": [{
-    "name": "@majd_bishara"
-  }],
+  "contributors": [
+    {
+      "name": "@majd_bishara"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/ThatMajd/homebridge-RedAlert.git"
   },
   "dependencies": {
-    "request": "^2.0.0"
+    "request": "^2.0.0",
+    "requests": "^0.3.0"
   }
 }

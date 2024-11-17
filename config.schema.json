@@ -1,5 +1,5 @@
 {
-    "pluginAlias": "Red Alert homebridge",
+    "pluginAlias": "RedAlert",
     "pluginType": "accessory",
     "singular": true,
     "schema": {
@@ -8,7 +8,7 @@
         "name": {
           "title": "name",
           "type": "string",
-          "default": "red_alert_sensor",
+          "default": "RedAlert",
           "required": true
         },
         "targets": {
