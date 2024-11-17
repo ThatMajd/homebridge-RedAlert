@@ -15,7 +15,13 @@
             "accessory": "Motion",
             "name": "Red Alrt Sensor",
             "url": "http://localhost:3000",
-            "http_method": "GET"
+            "http_method": "GET",
+            "update_interval": 5
+        },
+        {
+            "url": "http://localhost:3000",
+            "update_interval": 2000,
+            "targets": ["מעלות תרשיחא", "חורפיש", "תל אביב"]
         }
     ]
 }

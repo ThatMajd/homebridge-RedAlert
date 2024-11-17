@@ -1,29 +1,54 @@
 var Service, Characteristic;
 const request = require('request');
 
-const DEF_TIMEOUT = 3000, //3s
-      DEF_INTERVAL = 60000; //60s
+const DEF_TIMEOUT = 3000; // 3 seconds
+const DEF_INTERVAL = 1000; // 1 second
+
+const URL = "https://www.oref.org.il/WarningMessages/alert/alerts.json";
+const HTTP_METHOD = "GET";
+const JSON_RESPONSE = "data";
+const HEADERS = {
+    "Host": "www.oref.org.il",
+    "Connection": "close",
+    "X-Requested-With": "XMLHttpRequest",
+    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "Referer": "https://www.oref.org.il/12481-he/Pakar.aspx"
+};
 
 module.exports = function (homebridge) {
-   Service = homebridge.hap.Service;
-   Characteristic = homebridge.hap.Characteristic;
-   homebridge.registerAccessory("homebridge-MotionSensor", "Motion", HttpMotion);
-}
-
+    Service = homebridge.hap.Service;
+    Characteristic = homebridge.hap.Characteristic;
+    homebridge.registerAccessory("homebridge-MotionSensor", "Motion", HttpMotion);
+};
 
 function HttpMotion(log, config) {
    this.log = log;
 
-   // url info
-   this.url = config["url"];
-   this.http_method = config["http_method"] || "GET";
-   this.name = config["name"];
-   this.manufacturer = config["manufacturer"] || "@lagunacomputer";
-   this.model = config["model"] || "Simple HTTP motion sensor";
-   this.serial = config["serial"] || "Non-defined serial";
+   // Default fallback configuration if none is provided
+   if (!config) {
+       this.log("No configuration provided. Using default settings.");
+       this.url = URL;
+       this.http_method = HTTP_METHOD;
+       this.json_response = JSON_RESPONSE;
+       this.update_interval = DEF_INTERVAL;
+       this.headers = HEADERS;
+       this.targets = ["מעלות תרשיחא"]; // Default target list
+   } else {
+       // Use provided configuration
+       this.log("Using custom configuration")
+       this.url = config["url"] || URL;
+       this.http_method = config["http_method"] || HTTP_METHOD;
+       this.json_response = config["json_response"] || JSON_RESPONSE;
+       this.update_interval = Number(config["update_interval"] || DEF_INTERVAL);
+       this.headers = config["headers"] || HEADERS;
+       this.targets = config["targets"] || ["מעלות תרשיחא"]; // Configurable target list
+   }
+
+   this.name = "Red Alert Sensor";
+   this.manufacturer = "@Majd_Bishara";
+   this.model = "Red_Alerter_5000";
+   this.serial = "420-420-420";
    this.timeout = DEF_TIMEOUT;
-   this.json_response = config["json_response"] || "";
-   this.update_interval = Number( config["update_interval"] || DEF_INTERVAL );
 
    // Internal variables
    this.last_state = false;
@@ -31,82 +56,83 @@ function HttpMotion(log, config) {
 }
 
 HttpMotion.prototype = {
-
    updateState: function () {
-      //Ensure previous call finished
-      if (this.waiting_response) {
-         this.log('Avoid updateState as previous response does not arrived yet');
-         return;
-      }
-      this.waiting_response = true;
+       // Ensure previous call finished
+       if (this.waiting_response) {
+           this.log('Avoiding updateState as previous response has not arrived yet');
+           return;
+       }
+       this.waiting_response = true;
 
-      var ops = {
-         uri:    this.url,
-         method: this.http_method,
-         timeout: this.timeout
-      };
-      this.log('Requesting motion on "' + ops.uri + '", method ' + ops.method + ', timeout ' + ops.timeout);
-      request(ops, (error, res, body) => {
-         var value = null;
-         if (error) {
-            this.log('HTTP bad response (' + ops.uri + '): ' + error.message);
-         } else if (this.json_response === "") {
-            value = body;
-            this.log('HTTP successful response: ' + body);
-         } else {
-            try {
-               value = JSON.parse(body)[this.json_response];
-               this.log('HTTP successful response: ' + body);
-            } catch (parseErr) {
-               this.log('Error processing received information: ' + parseErr.message);
-               error = parseErr;
-            }
-         }
-         if (!error) {
-            // Properly set the return value
-            if (value === '1' || value === 1 || value === 'true' || value === 'TRUE') value = true;
-            else if (value === '0' || value === 0 || value === 'false' || value === 'FALSE') value = false;
+       const ops = {
+           uri: this.url,
+           method: this.http_method,
+           timeout: this.timeout,
+           headers: this.headers,
+       };
 
-            // Check if return value is valid
-            if (value !== true && value !== false) {
-                this.log('Received value is not valid. Keeping last_state: "' + this.last_state + '"');
-            } else {
-                this.motionService
-                   .getCharacteristic(Characteristic.MotionDetected).updateValue(value, null, "updateState");
-                this.last_state = value;
-            }
-         }
-         this.waiting_response = false;
-      });
+       this.log(`Requesting motion data from "${ops.uri}" with method ${ops.method}`);
+       request(ops, (error, res, body) => {
+           let value = false;
+           if (error) {
+               this.log(`HTTP bad response (${ops.uri}): ${error.message}`);
+           } else {
+               try {
+                   const response = JSON.parse(body);
+                   const dataList = response[this.json_response];
+
+                   this.log(`HTTP successful response: ${body}`);
+
+                   // Check if any of the targets are in the data list
+                   if (Array.isArray(dataList)) {
+                       value = this.targets.some(target => dataList.includes(target));
+                       if (value) {
+                           this.log(`Detected target(s) in data: ${this.targets}`);
+                       }
+                   } else {
+                       this.log(`Expected an array in the response, got: ${typeof dataList}`);
+                   }
+               } catch (parseErr) {
+                   this.log(`Error processing received information: ${parseErr.message}`);
+               }
+           }
+
+           // Update the sensor state
+           this.motionService
+               .getCharacteristic(Characteristic.MotionDetected)
+               .updateValue(value, null, "updateState");
+           this.last_state = value;
+
+           this.waiting_response = false;
+       });
    },
 
    getState: function (callback) {
-      var state = this.last_state;
-      var update = !this.waiting_response;
-      var sync = this.update_interval === 0;
-      this.log('Call to getState: last_state is "' + state + '", will update state now "' + update + '"' );
-      if (update) {
-         setImmediate(this.updateState.bind(this));
-      }
-      callback(null, state);
+       const state = this.last_state;
+       const update = !this.waiting_response;
+       this.log(`Call to getState: last_state is "${state}", will update state now: ${update}`);
+       if (update) {
+           setImmediate(this.updateState.bind(this));
+       }
+       callback(null, state);
    },
 
    getServices: function () {
-      this.informationService = new Service.AccessoryInformation();
-      this.informationService
-      .setCharacteristic(Characteristic.Manufacturer, this.manufacturer)
-      .setCharacteristic(Characteristic.Model, this.model)
-      .setCharacteristic(Characteristic.SerialNumber, this.serial);
+       this.informationService = new Service.AccessoryInformation();
+       this.informationService
+           .setCharacteristic(Characteristic.Manufacturer, this.manufacturer)
+           .setCharacteristic(Characteristic.Model, this.model)
+           .setCharacteristic(Characteristic.SerialNumber, this.serial);
 
-      this.motionService = new Service.MotionSensor(this.name);
-      this.motionService
-         .getCharacteristic(Characteristic.MotionDetected)
-         .on('get', this.getState.bind(this));
+       this.motionService = new Service.MotionSensor(this.name);
+       this.motionService
+           .getCharacteristic(Characteristic.MotionDetected)
+           .on('get', this.getState.bind(this));
 
-      if (this.update_interval > 0) {
-         this.timer = setInterval(this.updateState.bind(this), this.update_interval);
-      }
+       if (this.update_interval > 0) {
+           this.timer = setInterval(this.updateState.bind(this), this.update_interval);
+       }
 
-      return [this.informationService, this.motionService];
-   }
+       return [this.informationService, this.motionService];
+   },
 };
