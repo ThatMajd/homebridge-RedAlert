@@ -66,7 +66,7 @@ HttpMotion.prototype = {
            headers: this.headers,
        };
 
-       this.log(`Requesting motion data from "${ops.uri}" with method ${ops.method}`);
+      //  this.log(`Requesting motion data from "${ops.uri}" with method ${ops.method}`);
        request(ops, (error, res, body) => {
            let value = false;
            if (error) {
