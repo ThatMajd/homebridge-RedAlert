@@ -75,10 +75,11 @@ HttpMotion.prototype = {
            } else {
                if (body && body.trim()){
                   try {
+                     const cleanedBody = body.trim().replace(/^\uFEFF/, '');
                      // Can be deleted to reduce log clutter
-                     this.log(`HTTP successful response: ${body}`);
+                     this.log(`HTTP successful response: ${cleanedBody}`);
 
-                     const response = JSON.parse(body);
+                     const response = JSON.parse(cleanedBody);
                      const dataList = response[this.json_response];
 
 
@@ -91,6 +92,8 @@ HttpMotion.prototype = {
                      } 
                      else {
                         this.log(`Expected an array in the response, got: ${typeof dataList}`);
+                        
+                        this.log(res.toJSON())
                      }
                   }
                   catch (parseErr) {
