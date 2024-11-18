@@ -11,7 +11,7 @@ const HEADERS = {
     "Host": "www.oref.org.il",
     "Connection": "close",
     "X-Requested-With": "XMLHttpRequest",
-    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    "Content-Type": "application/json",
     "Referer": "https://www.oref.org.il/12481-he/Pakar.aspx"
 };
 
@@ -77,7 +77,7 @@ HttpMotion.prototype = {
                   try {
                      // Can be deleted to reduce log clutter
                      this.log(`HTTP successful response: ${body}`);
-                     
+
                      const response = JSON.parse(body);
                      const dataList = response[this.json_response];
 
